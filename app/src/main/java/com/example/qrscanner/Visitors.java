@@ -2,12 +2,13 @@ package com.example.qrscanner;
 
 public class Visitors {
 
-    private  String Name, Id, Sem, branch;
+    private  String Name, Id, Sem, branch,time;
 
-    public Visitors(String name, String id, String sem, String branch) {
-        Name = name;
-        Id = id;
-        Sem = sem;
+    public Visitors(String name, String id, String sem, String branch,String t) {
+        this.Name = name;
+        this.Id = id;
+        this.Sem = sem;
+        this.time = t;
         this.branch = branch;
     }
 
@@ -44,5 +45,13 @@ public class Visitors {
 
     public void setBranch(String branch) {
         this.branch = branch;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }

@@ -38,6 +38,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         holder.Id.setText(visitors.getId());
         holder.Sem.setText(visitors.getSem());
         holder.Branch.setText(visitors.getBranch());
+        holder.time.setText(visitors.getTime());
 
     }
 
@@ -48,7 +49,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     public static class MyViewHolder extends RecyclerView.ViewHolder{
 
-        TextView Name,Id,Sem,Branch;
+        TextView Name,Id,Sem,Branch,time;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -57,7 +58,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             Id = itemView.findViewById(R.id.tvID);
             Sem = itemView.findViewById(R.id.tvSem);
             Branch = itemView.findViewById(R.id.tvBranch);
+            time = itemView.findViewById(R.id.tvTime);
+
         }
     }
-
 }
