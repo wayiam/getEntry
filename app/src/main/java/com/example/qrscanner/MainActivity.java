@@ -6,9 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -25,16 +29,22 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
-    DatabaseReference databaseReferenceDate,databaseReferenceVisitor,databaseReferenceDB;
-    MyAdapter myAdapter,mysecondAdapter;
+    DatabaseReference databaseReferenceDate,databaseReferenceVisitor, databaseReferenceChild;
+    MyAdapter myAdapter;
+    DateAdapter dateAdapter;
     ArrayList<Visitors> list;
-    ArrayList<DB> listDB;
+    ArrayList<Dates> listDates;
     FloatingActionButton faBtn;
     String time, date;
+    final Calendar myCalendar = Calendar.getInstance();
+    EditText editText;
+    String chosenDate;
+    Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +53,54 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.historyList);
         faBtn = (FloatingActionButton) findViewById(R.id.fab);
+        button = (Button) findViewById(R.id.button);
+        editText = (EditText) findViewById(R.id.Birthday);
+        chosenDate = editText.getEditableText().toString();
         databaseReferenceDate = FirebaseDatabase.getInstance().getReference("Date");
         databaseReferenceVisitor = FirebaseDatabase.getInstance().getReference("Visitors");
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+
+        DatePickerDialog.OnDateSetListener d =new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int day) {
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH,month);
+                myCalendar.set(Calendar.DAY_OF_MONTH,day);
+                updateLabel();
+            }
+        };
+        editText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DatePickerDialog(MainActivity.this,d,myCalendar.get(Calendar.YEAR),myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                databaseReferenceChild = FirebaseDatabase.getInstance().getReference("Date").child(chosenDate);
+                databaseReferenceChild.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+
+                            Dates dates = dataSnapshot.getValue(Dates.class);
+                            listDates.add(dates);
+
+                        }
+                        dateAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        });
 
 
         faBtn.setOnClickListener(new View.OnClickListener() {
@@ -66,9 +120,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         list = new ArrayList<>();
-        listDB = new ArrayList<>();
+        listDates = new ArrayList<>();
         myAdapter = new MyAdapter(this, list);
-        recyclerView.setAdapter(myAdapter);
+        dateAdapter = new DateAdapter(this,listDates);
+        recyclerView.setAdapter(dateAdapter);
 
 
 //        databaseReferenceDate.addValueEventListener(new ValueEventListener() {
@@ -107,6 +162,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
     }
 
     @Override
@@ -127,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
 //                        continue;
                     if (list.get(i).getId().compareTo(userId) == 0){
                         Visitors v = list.get(i);
-                        addVisitor(v.getName(),userId,v.getSem(),v.getBranch(),date,time);
+                        addDate(v.getName(),userId,v.getSem(),v.getBranch(),date,time);
                     }
 
                 }
@@ -141,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void addVisitor(String Name, String userId, String sem, String branch,String date,String time) {
+    private void addDate(String Name, String userId, String sem, String branch,String date,String time) {
 
          Visitors visitor = new Visitors(Name, userId, sem, branch,time);
         //    Visitors v = new Visitors("Suniyo","1111","7","ECE",time);
@@ -166,5 +223,11 @@ public class MainActivity extends AppCompatActivity {
 //        Visitors visitor = new Visitors(Name, userId, sem, branch,time);
 //        databaseReferenceDate.child(date).child(visitor.getId()).setValue(visitor);
 //    }
+
+    private void updateLabel(){
+        DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+        editText.setText(df.format(myCalendar.getTime()));
+        chosenDate = editText.getEditableText().toString();
+    }
 
 }

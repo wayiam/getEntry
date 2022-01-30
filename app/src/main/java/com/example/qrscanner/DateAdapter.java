@@ -11,15 +11,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+public class DateAdapter extends RecyclerView.Adapter<DateAdapter.MyViewHolder> {
     //Chosen firebase Context here
     Context context;
 
-    ArrayList<Visitors> list;
+    ArrayList<Dates> listDates;
 
-    public MyAdapter(Context context, ArrayList<Visitors> list) {
+    public DateAdapter(Context context, ArrayList<Dates> list) {
         this.context = context;
-        this.list = list;
+        this.listDates = list;
     }
 
     @NonNull
@@ -33,18 +33,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 
-        Visitors visitors = list.get(position);
-        holder.Name.setText(visitors.getName());
-        holder.Id.setText(visitors.getId());
-        holder.Sem.setText(visitors.getSem());
-        holder.Branch.setText(visitors.getBranch());
-        holder.time.setText(visitors.getTime());
+        Dates dates = listDates.get(position);
+        holder.Name.setText(dates.getName());
+        holder.Id.setText(dates.getId());
+        holder.Sem.setText(dates.getSem());
+        holder.Branch.setText(dates.getBranch());
+        holder.time.setText(dates.getTime());
 
     }
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return listDates.size();
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder{
