@@ -34,11 +34,11 @@ public class DateAdapter extends RecyclerView.Adapter<DateAdapter.MyViewHolder> 
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 
         Dates dates = listDates.get(position);
-        holder.Name.setText(dates.getName());
-        holder.Id.setText(dates.getId());
-        holder.Sem.setText(dates.getSem());
-        holder.Branch.setText(dates.getBranch());
-        holder.time.setText(dates.getTime());
+        holder.Name.setText("Name:  "+ dates.getName());
+        holder.Id.setText("Id:  "+ dates.getId());
+        holder.Sem.setText("Sem:  " +dates.getSem());
+        holder.Branch.setText("Branch:  "+ dates.getBranch());
+        holder.time.setText("Time:  " +dates.getTime());
 
     }
 

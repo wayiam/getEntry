@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         recyclerView = findViewById(R.id.historyList);
         faBtn = (FloatingActionButton) findViewById(R.id.fab);
         button = (Button) findViewById(R.id.button);
@@ -60,6 +59,16 @@ public class MainActivity extends AppCompatActivity {
         databaseReferenceVisitor = FirebaseDatabase.getInstance().getReference("Visitors");
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+
+        //Take the date of today
+
+        Date tod = Calendar.getInstance().getTime();
+        DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+        DateFormat tf = new SimpleDateFormat("hh:mm a");
+        chosenDate = df.format(tod);
+        editText.setHint(chosenDate);
+
 
 
         DatePickerDialog.OnDateSetListener d =new DatePickerDialog.OnDateSetListener() {
@@ -81,15 +90,33 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                databaseReferenceChild = FirebaseDatabase.getInstance().getReference("Date").child(chosenDate);
-                databaseReferenceChild.addValueEventListener(new ValueEventListener() {
+                //Checking if Date is changed if changed the clearlistDates
+                databaseReferenceDate.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
 
                             Dates dates = dataSnapshot.getValue(Dates.class);
-                            listDates.add(dates);
+                            listDates.clear();
 
+                        }
+                        dateAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+                databaseReferenceChild = FirebaseDatabase.getInstance().getReference("Date").child(chosenDate);
+                //Getting the state of data and updating listDates according to chosendate.
+                databaseReferenceChild.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            Dates dates = dataSnapshot.getValue(Dates.class);
+                            listDates.add(dates);
                         }
                         dateAdapter.notifyDataSetChanged();
                     }
@@ -126,23 +153,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(dateAdapter);
 
 
-//        databaseReferenceDate.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-//
-//                    Visitors visitors = dataSnapshot.getValue(Visitors.class);
-//                    list.add(visitors);
-//
-//                }
-//                myAdapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
+
 
         databaseReferenceVisitor.addValueEventListener(new ValueEventListener() {
             @Override
@@ -186,12 +197,7 @@ public class MainActivity extends AppCompatActivity {
                         Visitors v = list.get(i);
                         addDate(v.getName(),userId,v.getSem(),v.getBranch(),date,time);
                     }
-
                 }
-
-     //        addVisitor("Doremon",userId,"7","CSE",date,time);
-//                addDB("New User",userId,"7","CSE");
-
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -199,18 +205,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addDate(String Name, String userId, String sem, String branch,String date,String time) {
-
-         Visitors visitor = new Visitors(Name, userId, sem, branch,time);
-        //    Visitors v = new Visitors("Suniyo","1111","7","ECE",time);
+        Visitors visitor = new Visitors(Name, userId, sem, branch,time);
         databaseReferenceDate.child(date).child(userId).setValue(visitor);
- //       databaseReferenceDate.child(date).child("1111").setValue(v);
-//    databaseReferenceVisitor.child(date).child(userId).setValue(visitor);
     }
-
-//    private void addDB(String Name,String userID,String sem, String branch){
-//
-//
-//    }
 
 //    private void addVisitor(Visitors visitor, String date, String time){
 //
